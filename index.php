@@ -148,12 +148,28 @@
 
             $risultato = convertiTemperatura($temperatura, $da, $a);
             $risultato = round($risultato, 2);
+
+            date_default_timezone_set('Europe/Rome');
+            $logPath = __DIR__ . '/data/log.txt';
+
+            $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+            $timestamp = date('Y/m/d - H:i:s');  // formato: YYYY/MM/DD - HH:MM:SS
+
+
+            $content = "[" . $timestamp . "]" . " - " . $ip . " - " . $da . " " . $a . " - " . $temperatura . " " . $scaleLabels[$da] . " = " . $risultato . " " . $scaleLabels[$a] . PHP_EOL;
             
+            $fh = fopen($logPath, 'a');
+            fwrite($fh, $content);
+            fclose($fh);
+
+            $handler = fopen("data/log.txt", "r");
+            $content = fread($handler, filesize("data/log.txt"));
             echo '<div class="result show">';
             echo '<div class="result-text">';
-            echo ($temperatura) . ' ' . $scaleLabels[$da] . ' = ' . $risultato . ' ' . $scaleLabels[$a];
+            echo  nl2br(nl2br($content));
             echo '</div>';
             echo '</div>';
+            fclose($handler);
         }
         ?>
     </div>
